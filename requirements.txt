@@ -1,0 +1,12 @@
+# py -3.11 -m venv venv to make a virtual environment
+# .\venv\Scripts\activate to activate the virtual environment
+# pip install -r requirements.txt to install the dependencies
+
+matplotlib
+numpy
+ipykernel
+jupyter 
+pandas
+scikit-learn
+seaborn
+nltk
