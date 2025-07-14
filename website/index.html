@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        
+        .input-area {
+            margin-bottom: 20px;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 150px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .positive {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .negative {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .neutral {
+            background-color: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+        
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .confidence {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .error {
+            color: #721c24;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sentiment Analysis Tool</h1>
+        
+        <div class="input-area">
+            <textarea id="text-input" placeholder="Enter your text here to analyze its sentiment..."></textarea>
+        </div>
+        
+        <button id="analyze-btn">Analyze Sentiment</button>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Analyzing text...</p>
+        </div>
+        
+        <div class="error" id="error"></div>
+        
+        <div class="result" id="result">
+            <h3>Sentiment: <span id="sentiment-label"></span></h3>
+            <p id="sentiment-text"></p>
+            <div class="confidence">
+                Confidence: <span id="confidence-value"></span>%
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const textInput = document.getElementById('text-input');
+            const loadingDiv = document.getElementById('loading');
+            const resultDiv = document.getElementById('result');
+            const errorDiv = document.getElementById('error');
+            
+            analyzeBtn.addEventListener('click', analyzeSentiment);
+            
+            async function analyzeSentiment() {
+                const text = textInput.value.trim();
+                
+                if (!text) {
+                    showError('Please enter some text to analyze.');
+                    return;
+                }
+                
+                // Clear previous results and errors
+                resultDiv.style.display = 'none';
+                errorDiv.style.display = 'none';
+                
+                // Show loading indicator
+                loadingDiv.style.display = 'block';
+                
+                try {
+                    const response = await fetch('/predict', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ text: text })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Server error: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Hide loading indicator
+                    loadingDiv.style.display = 'none';
+                    
+                    // Display results
+                    displayResult(data);
+                } catch (error) {
+                    loadingDiv.style.display = 'none';
+                    showError(`Error analyzing text: ${error.message}`);
+                }
+            }
+            
+            function displayResult(data) {
+    const sentimentLabel = document.getElementById('sentiment-label');
+    const sentimentText = document.getElementById('sentiment-text');
+    const confidenceValue = document.getElementById('confidence-value');
+    
+    // Map the prediction to your frontend sentiment categories
+    const sentiment = data.prediction.toLowerCase(); // Ensure lowercase for class names
+    const confidence = data.confidence || 0; // Handle null confidence
+    
+    // Set the sentiment label and text
+    sentimentLabel.textContent = sentiment;
+    sentimentText.textContent = getSentimentDescription(sentiment);
+    
+    // Format confidence as percentage with 2 decimal places
+    confidenceValue.textContent = (confidence * 100).toFixed(2);
+    
+    // Set the appropriate class based on sentiment
+    resultDiv.className = 'result';
+    resultDiv.classList.add(sentiment);
+    
+    // Show the result
+    resultDiv.style.display = 'block';
+}
+
+function getSentimentDescription(sentiment) {
+    // Customize these messages as needed
+    const descriptions = {
+        'positive': 'The review expresses positive sentiment.',
+        'negative': 'The review expresses negative sentiment.',
+        'neutral': 'The review is neutral.'
+    };
+    
+    return descriptions[sentiment] || `The sentiment is ${sentiment}.`;
+}
+
+function showError(message) {
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
+        });
+    </script>
+</body>
+</html>

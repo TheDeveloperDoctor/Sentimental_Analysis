@@ -10,3 +10,6 @@ pandas
 scikit-learn
 seaborn
 nltk
+Fastapi
+uvicorn
+tensorflow
