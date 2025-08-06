@@ -127,8 +127,8 @@ These can be loaded in a web API (e.g., FastAPI or Flask) for live predictions.
 
 ## 📌 Future Work
 
-* [ ] Deploy the model via **FastAPI**
-* [ ] Build a frontend using **Streamlit** or **Gradio**
+* [✅] Deploy the model via **FastAPI**
+* [✅] Build a frontend
 * [ ] Add support for multilingual sentiment analysis
 * [ ] Integrate with live Twitter API
 
