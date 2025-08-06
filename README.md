@@ -74,14 +74,6 @@ accuracy                             0.64
 
 ---
 
-## 📊 Training Visualization (TensorFlow)
-
-![Training Plot](./assets/training_plot.png)
-
-> Shows rapid overfitting — training accuracy hits 98% while validation stays at \~59%.
-
----
-
 ## 🔮 Predict Sentiment Example
 
 ```python
